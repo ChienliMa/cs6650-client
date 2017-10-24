@@ -251,7 +251,7 @@ public class Hw2Client {
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		
 		int latchCount = readThreadCount + writeThreadCount;
-		CountDownLatch latch = new CountDownLatch(latchCount-5);
+		CountDownLatch latch = new CountDownLatch(latchCount);
 		
 		for(int thread_i = 0; thread_i ++< writeThreadCount;) {
 			threads.add(new Thread(new Step4Runnable(client, profiler, latch, csvReader)));
