@@ -23,15 +23,22 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.util.*;
 
 class ResortClient {
 	private Client client;
 	private String prefix;
 	
-	public ResortClient(String ip, String port) { 
-		this.client = ClientBuilder.newClient().property("http.receive.timeout", 5000);;
-		this.prefix = "http://" + ip + ":" + port + "/cs6650/assignment/hw2";
+	public ResortClient(String ip, String port) {
+		String uri = "/resort";
+		this.client = ClientBuilder.newClient().property("http.receive.timeout", 5000);
+		if (!port.equals("null")) {
+			this.prefix = "http://" + ip + ":" + port + uri;
+		} else {
+			this.prefix = "http://"  + ip + uri;
+		}
+		
 	}
 	
 	private WebTarget newTarget(String uri) {
@@ -62,6 +69,32 @@ class ResortClient {
 		response.close();
 		return rval;
 	}
+}
+
+class MetricClient {
+	private Client client;
+	private String prefix;
+	private String url = "/metric";
+	public MetricClient(String ip, String port) { 
+		this.client = ClientBuilder.newClient().property("http.receive.timeout", 5000);
+		
+		if (!port.equals("null")) {
+			this.prefix = "http://" + ip + ":" + port;
+		} else {
+			this.prefix = "http://"  + ip;
+		}
+		
+	}
+	
+	public String getMetric(Long start, Long end) {
+		WebTarget target  = client.target(url);
+		target = target.queryParam("startMillis", start).queryParam("endMillis", end);
+		Response response = target.request(MediaType.TEXT_PLAIN_TYPE).get();
+		String rval =response.readEntity(String.class); 
+		response.close();
+		return rval;
+	}
+	
 }
 
 
@@ -184,7 +217,7 @@ class Step4Runnable extends GenaralRunnable implements Runnable {
 			}
 		} finally {
 			synchronized (this.latch) {
-				System.out.println(this.latch.getCount());
+				System.out.format("latch: %d\n", this.latch.getCount());
 				this.latch.countDown();	
 			}
 		}
@@ -213,13 +246,13 @@ class Step5Runnable extends GenaralRunnable implements Runnable {
 			    		end = System.currentTimeMillis();
 			    		this.profiler.addLatency(threadId, end- start);
 				} catch (javax.ws.rs.ProcessingException e) {
-					
+					e.printStackTrace();
 				}
 		    		
 		    }	
 		} finally {
 			synchronized (this.latch) {
-				System.out.println(this.latch.getCount());
+				System.out.format("latch: %d\n", this.latch.getCount());
 				this.latch.countDown();	
 			}
 		}
@@ -234,7 +267,7 @@ public class Hw2Client {
 		writeThreadCount = Integer.parseInt(args[0]);
 		readThreadCount = Integer.parseInt(args[1]);
 		maxId = Integer.parseInt(args[2]);
-		int iters = maxId/readThreadCount;
+		int iters = readThreadCount==0?0:(maxId/readThreadCount);
 		
 		ip = args[3];
 		port = args[4];
@@ -242,7 +275,7 @@ public class Hw2Client {
 		
 		ConcurrentCsvReader csvReader = null;
 		if (args.length > 5 && writeThreadCount > 0) {
-			csvReader = new ConcurrentCsvReader(args[5], 1000);
+			csvReader = new ConcurrentCsvReader(args[5], 100);
 			System.out.format("Loading csv: %s\n", args[4]);
 		}
 		
@@ -251,7 +284,7 @@ public class Hw2Client {
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		
 		int latchCount = readThreadCount + writeThreadCount;
-		CountDownLatch latch = new CountDownLatch(latchCount);
+		CountDownLatch latch = new CountDownLatch(latchCount-2);
 		
 		for(int thread_i = 0; thread_i ++< writeThreadCount;) {
 			threads.add(new Thread(new Step4Runnable(client, profiler, latch, csvReader)));
@@ -271,7 +304,9 @@ public class Hw2Client {
 		}
 		long end = System.currentTimeMillis();
 		
+		
 		System.out.format("client r_thread: %d, w_thread: %d, r_iters: %d, ip: %s, port: %s\n", readThreadCount, writeThreadCount, iters, ip, port);
+		System.out.println(new MetricClient(ip, port).getMetric(start, end));
 		profiler.printAnalyzation((end-start));
 	};
 }
