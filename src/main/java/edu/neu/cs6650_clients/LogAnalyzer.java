@@ -20,11 +20,15 @@ public class LogAnalyzer {
                     break;
             }
         }
+        if (latencies.size() == 0) {
+        		return "no logs";
+        }
         
         Collections.sort(latencies);
         Collections.sort(dbLatencies);
                 
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format("===== SERVER LOG METRICS =====\n"));
         stringBuilder.append(String.format("requests received: %d \n", latencies.size() + errorCount));
         stringBuilder.append(String.format("requests failed: %d \n", errorCount));
         stringBuilder.append(String.format("requests successed: %d \n", latencies.size()));

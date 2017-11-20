@@ -1,12 +1,8 @@
 package edu.neu.cs6650_clients;
 
-import java.net.URI;
-import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.ws.rs.ClientErrorException;
 
 /**
@@ -14,19 +10,9 @@ import javax.ws.rs.ClientErrorException;
  *
  */
 import javax.ws.rs.client.*;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.crypto.Data;
-
-import javassist.expr.NewArray;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.concurrent.*;
-import java.util.zip.Adler32;
 import java.util.*;
 
 class MyClient {
@@ -61,7 +47,6 @@ class MyClient {
 			public void run() {
 				long start, end;
 				WebTarget target = client.target("http://" + ip + ":" + port + "/cs6650/assignment/hw1/");
-				long id = System.currentTimeMillis();
 				for (int i = 0; i < n_iters; i += 1) {
 //					System.out.format("thread: %d, iter: %d \r", id, i);
 					Response response = null;

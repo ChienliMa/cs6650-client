@@ -5,9 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 public class ConnectionPool {
 
 	// User to connect to your database instance. By default, this is "root2".
@@ -23,7 +20,7 @@ public class ConnectionPool {
 
 	
 	/** Get the connection to the database instance. */
-	public static Connection getConnection() throws SQLException {
+	public static Connection getConnection() {
 		Connection connection = null;
 		try {
 			Properties connectionProperties = new Properties();
@@ -43,28 +40,12 @@ public class ConnectionPool {
 			    connectionProperties);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw e;
 		}
 		return connection;
 	}
 	
 	public static void testDbConnection() {
-		try {
-			Connection connection = ConnectionPool.getConnection();
-			System.out.println("succ");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	/** Close the connection to the database instance. */
-	public void closeConnection(Connection connection) throws SQLException {
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw e;
-		}
+		Connection connection = ConnectionPool.getConnection();
+		System.out.println(connection==null?"fail":"succ");
 	}
 }

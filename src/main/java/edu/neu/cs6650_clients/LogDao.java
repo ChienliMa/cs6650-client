@@ -8,8 +8,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class LogDao {
 	public static List<Log> getLogWithinTime(Long start, Long end) {
 		List<Log> logs = new ArrayList<Log>();
@@ -20,8 +18,6 @@ public class LogDao {
 		try {
 		    connection = (Connection) ConnectionPool.getConnection();
 		    statement = connection.prepareStatement("select status, dbTime, totalTime from Logs");
-//		    statement.setTimestamp(1, new Timestamp(start));
-//		    statement.setTimestamp(2, new Timestamp(end));
 		    rs = statement.executeQuery();
 		    while (rs.next()) {
 		    		logs.add(new Log(rs.getString(1), rs.getLong(2), rs.getLong(3)));

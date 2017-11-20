@@ -12,6 +12,6 @@ public class DashBoardClient {
 	}
 	
 	public static void main(String [] args) {
-		DashBoardClient.printMetrics(0l, 100l);
+		DashBoardClient.printMetrics(System.currentTimeMillis()-280000, System.currentTimeMillis());
 	}
 }
